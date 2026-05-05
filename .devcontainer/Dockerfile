@@ -4,8 +4,36 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+USER root
+
+# Use Azure Ubuntu mirror. This is usually more reliable inside GitHub Codespaces.
+RUN cat > /etc/apt/sources.list <<'EOF'
+deb http://azure.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
+deb http://azure.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://azure.archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
+deb http://azure.archive.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
+EOF
+
+# Robust apt update with retry loop.
+RUN set -eux; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*; \
+    for i in 1 2 3 4 5; do \
+      apt-get -o Acquire::Retries=10 \
+              -o Acquire::http::Timeout=180 \
+              update && break; \
+      echo "apt-get update failed. Retry $i..."; \
+      sleep 20; \
+    done
+
+RUN set -eux; \
+    apt-get -o Acquire::Retries=10 \
+            -o Acquire::http::Timeout=180 \
+            install -y --no-install-recommends \
     sudo \
     ca-certificates \
     wget \
@@ -25,9 +53,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     perl \
-    python \
+    python-is-python3 \
     python3 \
     python3-pip \
+    python3-venv \
     libtinfo5 \
     libncurses5 \
     libncursesw5 \
@@ -61,10 +90,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen en_US.UTF-8 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
 
 COPY start-vnc.sh /usr/local/bin/start-vnc.sh
 RUN chmod +x /usr/local/bin/start-vnc.sh
