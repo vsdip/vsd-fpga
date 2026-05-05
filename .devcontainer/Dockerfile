@@ -115,3 +115,11 @@ ENV PATH="${VTR_ROOT}/build/vtr-verilog-to-routing/bin:${VTR_ROOT}/vpr:${VTR_ROO
 
 USER vscode
 WORKDIR /workspaces/vsd-fpga
+
+ENV DISPLAY=:1
+
+COPY .devcontainer/supervisord.conf /etc/supervisor/conf.d/vnc.conf
+
+EXPOSE 6080
+
+CMD ["/usr/bin/supervisord", "-n"]
