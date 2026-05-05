@@ -14,7 +14,7 @@
   "hostRequirements": {
     "cpus": 4,
     "memory": "8gb",
-    "storage": "64gb"
+    "storage": "32gb"
   },
 
   "remoteUser": "vscode",
