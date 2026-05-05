@@ -7,8 +7,8 @@ ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
 
-# Keep Ubuntu 18.04 apt on HTTP.
-# HTTPS fails before ca-certificates are installed in the base image.
+# Keep Ubuntu 18.04 on HTTP.
+# Do not move to old-releases or HTTPS inside this base image.
 RUN sed -i 's|https://archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
     && sed -i 's|https://security.ubuntu.com/ubuntu|http://security.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
     && sed -i 's|https://ports.ubuntu.com/ubuntu-ports|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list || true
@@ -19,8 +19,8 @@ RUN apt-get clean \
                -o Acquire::http::Timeout=180 \
                update
 
-RUN apt-get -o Acquire::Retries=10 \
-            -o Acquire::http::Timeout=60 \
+RUN apt-get -o Acquire::Retries=20 \
+            -o Acquire::http::Timeout=180 \
             -o Dpkg::Options::="--force-confold" \
             install -y --no-install-recommends \
     sudo \
@@ -99,4 +99,4 @@ RUN mkdir -p ${HOME}/.vnc \
 
 EXPOSE 6080 5901
 
-CMD ["/usr/local/bin/start-vnc.sh"]
+CMD ["sleep", "infinity"]
