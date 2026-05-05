@@ -7,15 +7,16 @@ ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
 
-RUN sed -i 's|http://archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|http://security.ubuntu.com/ubuntu|https://security.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|http://ports.ubuntu.com/ubuntu-ports|https://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list || true
-    
+# Keep Ubuntu 18.04 apt on HTTP.
+# HTTPS fails before ca-certificates are installed in the base image.
+RUN sed -i 's|https://archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|https://security.ubuntu.com/ubuntu|http://security.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|https://ports.ubuntu.com/ubuntu-ports|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list || true
+
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get -o Acquire::Retries=10 \
-               -o Acquire::http::Timeout=120 \
-               -o Acquire::https::Timeout=120 \
+    && apt-get -o Acquire::Retries=20 \
+               -o Acquire::http::Timeout=180 \
                update
 
 RUN apt-get -o Acquire::Retries=10 \
