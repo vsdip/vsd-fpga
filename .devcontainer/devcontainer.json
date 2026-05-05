@@ -7,7 +7,7 @@
   "portsAttributes": {
     "6080": {
       "label": "noVNC Desktop",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "notify"
     }
   },
 
@@ -16,8 +16,6 @@
     "memory": "8gb",
     "storage": "32gb"
   },
-
-  "overrideCommand": false,
 
   "remoteUser": "vscode",
 
@@ -40,5 +38,6 @@
     }
   },
 
+  "postStartCommand": "bash .devcontainer/start-novnc.sh",
   "postCreateCommand": "bash .devcontainer/setup-vsd-fpga.sh"
 }
