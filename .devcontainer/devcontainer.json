@@ -2,10 +2,31 @@
   "name": "VSD FPGA Fabric Workshop",
   "image": "ghcr.io/vsdip/vsd-fpga-codespace:latest",
 
+  "forwardPorts": [6080],
+
+  "portsAttributes": {
+    "6080": {
+      "label": "noVNC Desktop",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
   "hostRequirements": {
     "cpus": 4,
     "memory": "8gb",
     "storage": "32gb"
+  },
+
+  "overrideCommand": false,
+
+  "remoteUser": "vscode",
+
+  "containerEnv": {
+    "DISPLAY": ":1"
+  },
+
+  "remoteEnv": {
+    "DISPLAY": ":1"
   },
 
   "customizations": {
@@ -19,7 +40,5 @@
     }
   },
 
-  "postCreateCommand": "bash .devcontainer/setup-vsd-fpga.sh",
-
-  "remoteUser": "vscode"
+  "postCreateCommand": "bash .devcontainer/setup-vsd-fpga.sh"
 }
