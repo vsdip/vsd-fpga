@@ -1,28 +1,11 @@
-FROM ubuntu:18.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV USER=vscode
-ENV HOME=/home/vscode
 ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
 
-# Keep Ubuntu 18.04 on HTTP.
-# Do not move to old-releases or HTTPS inside this base image.
-RUN sed -i 's|https://archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|https://security.ubuntu.com/ubuntu|http://security.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|https://ports.ubuntu.com/ubuntu-ports|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list || true
-
-RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get -o Acquire::Retries=20 \
-               -o Acquire::http::Timeout=180 \
-               update
-
-RUN apt-get -o Acquire::Retries=20 \
-            -o Acquire::http::Timeout=180 \
-            -o Dpkg::Options::="--force-confold" \
-            install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     ca-certificates \
     wget \
@@ -83,19 +66,15 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
-RUN useradd -s /bin/bash -m ${USER} \
-    && echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USER} \
-    && chmod 0440 /etc/sudoers.d/${USER}
-
 COPY start-vnc.sh /usr/local/bin/start-vnc.sh
 RUN chmod +x /usr/local/bin/start-vnc.sh
 
-USER ${USER}
-WORKDIR ${HOME}
+USER vscode
+WORKDIR /home/vscode
 
-RUN mkdir -p ${HOME}/.vnc \
-    && printf '#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\nstartxfce4 &\n' > ${HOME}/.vnc/xstartup \
-    && chmod +x ${HOME}/.vnc/xstartup
+RUN mkdir -p /home/vscode/.vnc \
+    && printf '#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\nstartxfce4 &\n' > /home/vscode/.vnc/xstartup \
+    && chmod +x /home/vscode/.vnc/xstartup
 
 EXPOSE 6080 5901
 
