@@ -7,15 +7,15 @@ ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
 
-RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|http://security.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
-    && sed -i 's|http://ports.ubuntu.com/ubuntu-ports|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list || true
-
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|http://security.ubuntu.com/ubuntu|https://security.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|http://ports.ubuntu.com/ubuntu-ports|https://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list || true
+    
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -o Acquire::Retries=10 \
-               -o Acquire::http::Timeout=60 \
-               -o Acquire::ftp::Timeout=60 \
+               -o Acquire::http::Timeout=120 \
+               -o Acquire::https::Timeout=120 \
                update
 
 RUN apt-get -o Acquire::Retries=10 \
