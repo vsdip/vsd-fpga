@@ -10,7 +10,19 @@ echo "Disk space:"
 df -h /
 
 echo ""
-echo "Checking tools..."
+echo "Checking GUI / noVNC services:"
+pgrep -a Xvfb || true
+pgrep -a x11vnc || true
+pgrep -a websockify || true
+pgrep -a xfce4 || true
+pgrep -a supervisord || true
+
+echo ""
+echo "Checking port 6080:"
+ss -ltnp | grep 6080 || true
+
+echo ""
+echo "Checking tools:"
 
 check_tool() {
     if command -v "$1" >/dev/null 2>&1; then
@@ -32,16 +44,23 @@ check_tool verilator
 check_tool yosys
 check_tool vpr
 check_tool openfpga
+check_tool Xvfb
+check_tool x11vnc
+check_tool websockify
+check_tool supervisord
 
 echo ""
-echo "Environment variables:"
+echo "Environment:"
+echo "DISPLAY=${DISPLAY:-not set}"
 echo "VSD_TOOLS=${VSD_TOOLS:-not set}"
 echo "VTR_ROOT=${VTR_ROOT:-not set}"
 echo "OPENFPGA_ROOT=${OPENFPGA_ROOT:-not set}"
 
 echo ""
-echo "Final disk usage:"
-df -h /
+echo "If noVNC does not open automatically:"
+echo "1. Go to Codespaces Ports tab"
+echo "2. Open port 6080"
+echo "3. Click vnc_lite.html"
 
 echo ""
-echo "Setup check complete."
+echo "Environment check complete."
