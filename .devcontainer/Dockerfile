@@ -7,7 +7,21 @@ ENV DISPLAY=:1
 ENV VNC_GEOMETRY=1600x900
 ENV VNC_DEPTH=24
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|http://security.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
+    && sed -i 's|http://ports.ubuntu.com/ubuntu-ports|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list || true
+
+RUN apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -o Acquire::Retries=10 \
+               -o Acquire::http::Timeout=60 \
+               -o Acquire::ftp::Timeout=60 \
+               update
+
+RUN apt-get -o Acquire::Retries=10 \
+            -o Acquire::http::Timeout=60 \
+            -o Dpkg::Options::="--force-confold" \
+            install -y --no-install-recommends \
     sudo \
     ca-certificates \
     wget \
@@ -22,7 +36,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     file \
     locales \
     tzdata \
-    software-properties-common \
     build-essential \
     make \
     gcc \
