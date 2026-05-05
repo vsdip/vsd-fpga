@@ -11,7 +11,7 @@
   "portsAttributes": {
     "6080": {
       "label": "noVNC Desktop",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "notify"
     },
     "5901": {
       "label": "VNC Server",
