@@ -1,1 +1,31 @@
-test
+{
+  "name": "VSD Xilinx Vivado 2019.2 Ubuntu 18.04 VNC",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--shm-size=2g"
+  ],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [6080, 5901],
+  "portsAttributes": {
+    "6080": {
+      "label": "noVNC Desktop",
+      "onAutoForward": "openBrowser"
+    },
+    "5901": {
+      "label": "VNC Server",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "bash scripts/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "mshr-h.veriloghdl",
+        "eirikpre.systemverilog"
+      ]
+    }
+  }
+}
