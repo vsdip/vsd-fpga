@@ -1,106 +1,103 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-20.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV DISPLAY=:1
-ENV VNC_GEOMETRY=1600x900
-ENV VNC_DEPTH=24
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 USER root
 
-# Use Azure Ubuntu mirror. This is usually more reliable inside GitHub Codespaces.
-RUN cat > /etc/apt/sources.list <<'EOF'
-deb http://azure.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
-deb http://azure.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
-deb http://azure.archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
-deb http://azure.archive.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
-EOF
-
-# Robust apt update with retry loop.
-RUN set -eux; \
-    apt-get clean; \
-    rm -rf /var/lib/apt/lists/*; \
-    for i in 1 2 3 4 5; do \
-      apt-get -o Acquire::Retries=10 \
-              -o Acquire::http::Timeout=180 \
-              update && break; \
-      echo "apt-get update failed. Retry $i..."; \
-      sleep 20; \
-    done
-
-RUN set -eux; \
-    apt-get -o Acquire::Retries=10 \
-            -o Acquire::http::Timeout=180 \
-            install -y --no-install-recommends \
-    sudo \
-    ca-certificates \
-    wget \
-    curl \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    autoconf \
+    automake \
+    bison \
+    flex \
+    g++ \
+    gcc \
+    g++-11 \
+    gcc-11 \
+    clang \
+    clang-format \
+    cmake \
+    make \
+    ninja-build \
+    ccache \
     git \
-    bash \
-    tar \
-    gzip \
+    git-lfs \
+    curl \
+    wget \
     unzip \
     zip \
-    xz-utils \
+    tar \
+    rsync \
+    time \
+    tree \
+    vim \
+    nano \
+    less \
     file \
-    locales \
-    tzdata \
-    build-essential \
-    make \
-    gcc \
-    g++ \
-    perl \
-    python-is-python3 \
+    pkg-config \
     python3 \
     python3-pip \
+    python3-setuptools \
     python3-venv \
-    libtinfo5 \
-    libncurses5 \
-    libncursesw5 \
-    libstdc++6 \
-    libx11-6 \
-    libxext6 \
-    libxrender1 \
-    libxtst6 \
-    libxi6 \
-    libxft2 \
-    libxss1 \
-    libgtk2.0-0 \
-    libgtk-3-0 \
-    libcanberra-gtk-module \
-    libcanberra-gtk3-module \
-    libglib2.0-0 \
-    libsm6 \
-    libice6 \
-    libfontconfig1 \
-    libfreetype6 \
-    libdbus-glib-1-2 \
-    libusb-1.0-0 \
-    xterm \
-    dbus-x11 \
-    xfce4 \
-    xfce4-terminal \
-    tigervnc-standalone-server \
-    tigervnc-common \
-    novnc \
-    websockify \
-    && locale-gen en_US.UTF-8 \
+    python3-lxml \
+    python3-tk \
+    perl \
+    tcl \
+    tcl-dev \
+    tcl8.6-dev \
+    tcllib \
+    expect \
+    swig \
+    gperf \
+    texinfo \
+    doxygen \
+    gtkwave \
+    iverilog \
+    verilator \
+    yosys \
+    graphviz \
+    x11-apps \
+    libfl-dev \
+    libffi-dev \
+    libevent-dev \
+    libcairo2-dev \
+    libfontconfig1-dev \
+    fontconfig \
+    libx11-dev \
+    libxft-dev \
+    libxml2-dev \
+    libxml++2.6-dev \
+    libxml2-utils \
+    libgtk-3-dev \
+    libreadline-dev \
+    libncurses5-dev \
+    libssl-dev \
+    zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY start-vnc.sh /usr/local/bin/start-vnc.sh
-RUN chmod +x /usr/local/bin/start-vnc.sh
+RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && python3 -m pip install --no-cache-dir \
+       numpy \
+       pandas \
+       matplotlib \
+       pyyaml \
+       lxml \
+       psutil \
+       scipy \
+       jinja2 \
+       pyparsing \
+       humanize
+
+RUN mkdir -p /opt/vsd-tools /workspaces
+
+ENV VSD_TOOLS=/opt/vsd-tools
+ENV VTR_ROOT=/opt/vsd-tools/vtr-verilog-to-routing
+ENV OPENFPGA_ROOT=/opt/vsd-tools/OpenFPGA
+
+ENV PATH="${VTR_ROOT}/build/vtr-verilog-to-routing/bin:${VTR_ROOT}/vpr:${VTR_ROOT}/abc:${OPENFPGA_ROOT}/openfpga:${OPENFPGA_ROOT}/build/openfpga:${PATH}"
 
 USER vscode
-WORKDIR /home/vscode
-
-RUN mkdir -p /home/vscode/.vnc \
-    && printf '#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\nstartxfce4 &\n' > /home/vscode/.vnc/xstartup \
-    && chmod +x /home/vscode/.vnc/xstartup
-
-EXPOSE 6080 5901
-
-CMD ["sleep", "infinity"]
+WORKDIR /workspaces/vsd-fpga
