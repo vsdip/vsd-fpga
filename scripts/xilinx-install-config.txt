@@ -1,1 +1,16 @@
-test
+# Xilinx Unified Installer 2019.2 silent-install config
+# Target: Vivado HL WebPACK 2019.2
+# Install location: /tools/Xilinx
+
+Edition=Vivado HL WebPACK
+Product=Vivado
+Destination=/tools/Xilinx
+
+# Keep this true unless you have a strong reason to disable it.
+Enable WebTalk for Vivado=true
+Enable WebTalk for SDK=true
+Enable WebTalk for DocNav=true
+
+# Disk-saving module selection for education / FPGA flows.
+# Add or remove device families depending on your board requirement.
+Modules=Artix-7:1,Kintex-7:1,Virtex-7:0,Zynq-7000:1,Spartan-7:1,DocNav:0,SDK:1,Vivado:1
