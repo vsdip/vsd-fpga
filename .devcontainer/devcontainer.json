@@ -1,31 +1,25 @@
 {
-  "name": "VSD Xilinx Vivado 2019.2 Ubuntu 20.04 VNC",
-  "build": {
-    "dockerfile": "Dockerfile"
+  "name": "VSD FPGA Fabric Workshop",
+  "image": "ghcr.io/vsdip/vsd-fpga-codespace:latest",
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
   },
-  "runArgs": [
-    "--shm-size=2g"
-  ],
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "forwardPorts": [6080, 5901],
-  "portsAttributes": {
-    "6080": {
-      "label": "noVNC Desktop",
-      "onAutoForward": "notify"
-    },
-    "5901": {
-      "label": "VNC Server",
-      "onAutoForward": "silent"
-    }
-  },
-  "postCreateCommand": "bash scripts/post-create.sh",
+
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools",
         "mshr-h.veriloghdl",
-        "eirikpre.systemverilog"
+        "ms-python.python",
+        "ms-vscode.cpptools",
+        "eamodio.gitlens"
       ]
     }
-  }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup-vsd-fpga.sh",
+
+  "remoteUser": "vscode"
 }
