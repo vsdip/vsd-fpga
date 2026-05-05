@@ -75,6 +75,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libncurses5-dev \
     libssl-dev \
     zlib1g-dev \
+    xvfb \
+xfce4 \
+xfce4-session \
+xfce4-panel \
+xfdesktop4 \
+xfwm4 \
+xfce4-terminal \
+thunar \
+dbus-x11 \
+x11vnc \
+novnc \
+websockify \
+supervisor \
+x11-apps \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
